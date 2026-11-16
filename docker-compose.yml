@@ -1,0 +1,59 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: rag-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-academic_rag}
+      POSTGRES_USER: ${POSTGRES_USER:-rag_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rag_secret_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-pgvector.sql:/docker-entrypoint-initdb.d/01-init-pgvector.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rag_user} -d ${POSTGRES_DB:-academic_rag}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rag-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-academic_rag}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-rag_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-rag_secret_password}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      DOCLING_SERVE_URL: ${DOCLING_SERVE_URL:-http://docling-serve:5001}
+      DOCLING_ENABLED: ${DOCLING_ENABLED:-false}
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: rag-frontend
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8080}
+
+  docling-serve:
+    image: quay.io/docling-project/docling-serve:latest
+    container_name: rag-docling
+    profiles:
+      - docling
+    ports:
+      - "5001:5001"
+
+volumes:
+  postgres_data:

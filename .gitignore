@@ -1,0 +1,36 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Study Materials & Uploads (Không commit sách/slide lên repo)
+*.pdf
+*.pptx
+*.ppt
+*.docx
+uploads/
+data/
+
+# Evaluation Outputs
+eval/results/*
+!eval/results/.gitkeep
+
+# Java / Maven
+backend/target/
+*.jar
+*.war
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# IDE & OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# TypeScript / Next.js generated
+frontend/next-env.d.ts
+*.tsbuildinfo
