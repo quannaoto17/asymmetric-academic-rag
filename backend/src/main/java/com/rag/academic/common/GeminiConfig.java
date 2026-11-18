@@ -1,6 +1,6 @@
 package com.rag.academic.common;
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.googleai.GoogleAiEmbeddingModel;
 import dev.langchain4j.model.googleai.GoogleAiEmbeddingModel.TaskType;
@@ -15,40 +15,66 @@ import java.time.Duration;
 @Configuration
 public class GeminiConfig {
 
-    private static final String EMBEDDING_MODEL_NAME = "gemini-embedding-001";
-    private static final String CHAT_MODEL_NAME = "gemini-2.5-flash";
-    private static final int EMBEDDING_DIMENSIONS = 768;
-
     @Bean
     @Primary
-    public EmbeddingModel documentEmbeddingModel(@Value("${gemini.api-key}") String apiKey) {
+    public EmbeddingModel documentEmbeddingModel(
+            @Value("${gemini.api-key}") String apiKey,
+            @Value("${gemini.embedding.model-name}") String modelName,
+            @Value("${gemini.embedding.dimensions}") int dimensions,
+            @Value("${gemini.embedding.timeout}") Duration timeout,
+            @Value("${gemini.embedding.max-retries}") int maxRetries,
+            @Value("${gemini.embedding.log-requests}") boolean logRequests,
+            @Value("${gemini.embedding.log-responses}") boolean logResponses) {
         return GoogleAiEmbeddingModel.builder()
                 .apiKey(apiKey)
-                .modelName(EMBEDDING_MODEL_NAME)
-                .outputDimensionality(EMBEDDING_DIMENSIONS)
+                .modelName(modelName)
+                .outputDimensionality(dimensions)
                 .taskType(TaskType.RETRIEVAL_DOCUMENT)
-                .timeout(Duration.ofSeconds(30))
+                .timeout(timeout)
+                .maxRetries(maxRetries)
+                .logRequests(logRequests)
+                .logResponses(logResponses)
                 .build();
     }
 
     @Bean("queryEmbeddingModel")
-    public EmbeddingModel queryEmbeddingModel(@Value("${gemini.api-key}") String apiKey) {
+    public EmbeddingModel queryEmbeddingModel(
+            @Value("${gemini.api-key}") String apiKey,
+            @Value("${gemini.embedding.model-name}") String modelName,
+            @Value("${gemini.embedding.dimensions}") int dimensions,
+            @Value("${gemini.embedding.timeout}") Duration timeout,
+            @Value("${gemini.embedding.max-retries}") int maxRetries,
+            @Value("${gemini.embedding.log-requests}") boolean logRequests,
+            @Value("${gemini.embedding.log-responses}") boolean logResponses) {
         return GoogleAiEmbeddingModel.builder()
                 .apiKey(apiKey)
-                .modelName(EMBEDDING_MODEL_NAME)
-                .outputDimensionality(EMBEDDING_DIMENSIONS)
+                .modelName(modelName)
+                .outputDimensionality(dimensions)
                 .taskType(TaskType.RETRIEVAL_QUERY)
-                .timeout(Duration.ofSeconds(30))
+                .timeout(timeout)
+                .maxRetries(maxRetries)
+                .logRequests(logRequests)
+                .logResponses(logResponses)
                 .build();
     }
 
     @Bean
-    public ChatLanguageModel chatLanguageModel(@Value("${gemini.api-key}") String apiKey) {
+    public ChatModel chatLanguageModel(
+            @Value("${gemini.api-key}") String apiKey,
+            @Value("${gemini.chat.model-name}") String modelName,
+            @Value("${gemini.chat.temperature}") double temperature,
+            @Value("${gemini.chat.timeout}") Duration timeout,
+            @Value("${gemini.chat.max-retries}") int maxRetries,
+            @Value("${gemini.chat.log-requests}") boolean logRequests,
+            @Value("${gemini.chat.log-responses}") boolean logResponses) {
         return GoogleAiGeminiChatModel.builder()
                 .apiKey(apiKey)
-                .modelName(CHAT_MODEL_NAME)
-                .temperature(0.2)
-                .timeout(Duration.ofSeconds(60))
+                .modelName(modelName)
+                .temperature(temperature)
+                .timeout(timeout)
+                .maxRetries(maxRetries)
+                .logRequests(logRequests)
+                .logResponses(logResponses)
                 .build();
     }
 }
