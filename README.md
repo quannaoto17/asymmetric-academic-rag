@@ -7,7 +7,7 @@ Hệ thống **Asymmetric Academic RAG** hỗ trợ sinh viên IT đối chiếu
 - **Backend:** Java 21 (Virtual Threads), Spring Boot 3.4+, Maven, Springdoc OpenAPI (`/v3/api-docs`), Flyway
 - **AI & Orchestration:** LangChain4j (`langchain4j-spring-boot-starter`, `langchain4j-google-ai-gemini`, `langchain4j-pgvector`)
   - Embedding: `gemini-embedding-001` (768 dimensions)
-  - LLM Reasoning & Structured JSON Output: `gemini-2.5-flash` (temperature `0.2`)
+  - Chat model default: `gemini-3.1-flash-lite` (temperature `0.2`, configurable with `GEMINI_CHAT_MODEL`)
 - **Document Parsing:** Apache POI (`.pptx`), Apache PDFBox (`.pdf`), tùy chọn `docling-serve` (Docker profile `docling`)
 - **Database:** PostgreSQL 16 + `pgvector` (HNSW vector cosine + Full-Text `tsvector` + RRF)
 - **Frontend:** Next.js 15 (App Router), TypeScript, Tailwind CSS, `shadcn/ui`, `openapi-typescript` + `openapi-fetch`
@@ -50,6 +50,20 @@ Hệ thống **Asymmetric Academic RAG** hỗ trợ sinh viên IT đối chiếu
    - OpenAPI Spec: `http://localhost:8080/v3/api-docs`
 
 ## Phát triển cục bộ (Local Development)
+
+### Gemini model benchmark
+
+Configure `GEMINI_API_KEY`, then run the 20 Vietnamese prompts against the two configured models (40 model calls total):
+
+```powershell
+$env:GEMINI_API_KEY = (Select-String -Path .env -Pattern '^GEMINI_API_KEY=(.+)$').Matches.Groups[1].Value
+$env:GEMINI_COMPARISON_ENABLED = 'true'
+$env:GEMINI_COMPARISON_MODELS = 'gemini-3.1-flash-lite,gemini-3.5-flash-lite'
+$env:SPRING_MAIN_WEB_APPLICATION_TYPE = 'none'
+mvn -f backend/pom.xml '-Dspring-boot.run.main-class=com.rag.academic.eval.GeminiBenchmarkApplication' spring-boot:run
+```
+
+The runner does not require PostgreSQL and writes the results to [`docs/gemini-model-comparison.md`](docs/gemini-model-comparison.md). Review the responses, fill in the manual quality scores, and record the final selection there. The report includes observed quota/rate-limit errors; project quota limits must be checked in Google AI Studio or Google Cloud.
 
 ### Backend
 Yêu cầu JDK 21 và Docker (cho Testcontainers):

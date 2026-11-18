@@ -27,3 +27,21 @@ springdoc:
 
 gemini:
   api-key: ${GEMINI_API_KEY:dummy-key}
+  chat:
+    model-name: ${GEMINI_CHAT_MODEL:gemini-3.1-flash-lite}
+    comparison-models: ${GEMINI_COMPARISON_MODELS:gemini-3.1-flash-lite,gemini-3.5-flash-lite}
+    temperature: ${GEMINI_TEMPERATURE:0.2}
+    timeout: ${GEMINI_TIMEOUT:60s}
+    max-retries: ${GEMINI_MAX_RETRIES:2}
+    log-requests: ${GEMINI_LOG_REQUESTS:false}
+    log-responses: ${GEMINI_LOG_RESPONSES:false}
+  embedding:
+    model-name: ${GEMINI_EMBEDDING_MODEL:gemini-embedding-001}
+    dimensions: ${GEMINI_EMBEDDING_DIMENSIONS:768}
+    timeout: ${GEMINI_EMBEDDING_TIMEOUT:30s}
+    max-retries: ${GEMINI_EMBEDDING_MAX_RETRIES:2}
+    log-requests: ${GEMINI_EMBEDDING_LOG_REQUESTS:false}
+    log-responses: ${GEMINI_EMBEDDING_LOG_RESPONSES:false}
+  comparison:
+    enabled: ${GEMINI_COMPARISON_ENABLED:false}
+    output: ${GEMINI_COMPARISON_OUTPUT:../docs/gemini-model-comparison.md}
